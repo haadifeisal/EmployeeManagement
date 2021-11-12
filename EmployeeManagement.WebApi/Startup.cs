@@ -1,3 +1,5 @@
+using AutoMapper;
+using EmployeeManagement.WebApi.DataTransferObjects.Configuration;
 using EmployeeManagement.WebApi.Repositories.EmployeeManagement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +26,12 @@ namespace EmployeeManagement.WebApi
         {
 
             services.AddControllers();
+
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MapConfiguration());
+            });
+            var mapper = mappingConfig.CreateMapper();
 
             services.AddDbContext<EmployeeManagementContext>(options =>
             {
