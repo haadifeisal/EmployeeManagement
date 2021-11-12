@@ -14,11 +14,14 @@ namespace EmployeeManagement.WebApi.Services
     {
         private readonly IMapper _mapper;
         private readonly EmployeeManagementContext _employeeManagementContext;
+        private readonly IDepartmentService _departmentService;
 
-        public EmployeeService(IMapper mapper, EmployeeManagementContext employeeManagementContext)
+        public EmployeeService(IMapper mapper, EmployeeManagementContext employeeManagementContext,
+            IDepartmentService departmentService)
         {
             _mapper = mapper;
             _employeeManagementContext = employeeManagementContext;
+            _departmentService = departmentService;
         }
         
         public async Task<IEnumerable<Employee>> GetEmployees()
@@ -38,19 +41,18 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<Employee> CreateEmployee(EmployeeRequestDto employeeRequestDto)
         {
-            var employee = await _employeeManagementContext.Employees
-                .FirstOrDefaultAsync(x => x.Name.ToLower() == employeeRequestDto.Name.ToLower());
+            var department = await _departmentService.CheckIfDepartmentExist(employeeRequestDto.DepartmentId);
 
-            if (employee != null)
+            if(department == null)
             {
-                return null; 
+                return null;
             }
 
             var newEmployee = _mapper.Map<Employee>(employeeRequestDto);
             newEmployee.EmployeeId = Guid.NewGuid();
 
-            _employeeManagementContext.Employees.Add(newEmployee);
-            _employeeManagementContext.SaveChanges();
+            await _employeeManagementContext.Employees.AddAsync(newEmployee);
+            await _employeeManagementContext.SaveChangesAsync();
 
             return newEmployee;
         }
@@ -64,10 +66,9 @@ namespace EmployeeManagement.WebApi.Services
                 return null;
             }
 
-            var department = await _employeeManagementContext.Departments.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.DepartmentId == employeeRequestDto.DepartmentId);
+            var department = await _departmentService.CheckIfDepartmentExist(employeeRequestDto.DepartmentId);
 
-            if(department == null)
+            if (department == null)
             {
                 return null;
             }

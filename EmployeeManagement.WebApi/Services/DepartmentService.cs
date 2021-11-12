@@ -96,7 +96,7 @@ namespace EmployeeManagement.WebApi.Services
             return true;
         }
 
-        private async Task<Department> CheckIfDepartmentExist(Guid departmentId)
+        public async Task<Department> CheckIfDepartmentExist(Guid departmentId)
         {
             var department = await _employeeManagementContext.Departments
                 .FirstOrDefaultAsync(x => x.DepartmentId == departmentId);

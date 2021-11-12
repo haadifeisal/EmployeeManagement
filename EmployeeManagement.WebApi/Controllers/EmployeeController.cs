@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EmployeeManagement.WebApi.DataTransferObjects.RequestDtos;
 using EmployeeManagement.WebApi.DataTransferObjects.ResponseDtos;
 using EmployeeManagement.WebApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -55,6 +56,68 @@ namespace EmployeeManagement.WebApi.Controllers
             var mappedResult = _mapper.Map<EmployeeResponseDto>(employee);
 
             return Ok(mappedResult);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(typeof(EmployeeResponseDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateEmployee([FromBody] EmployeeRequestDto employeeRequestDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var employee = await _employeeService.CreateEmployee(employeeRequestDto);
+
+            if (employee == null)
+            {
+                return UnprocessableEntity();
+            }
+
+            var mappedResult = _mapper.Map<EmployeeResponseDto>(employee);
+
+            return Ok(mappedResult);
+        }
+
+
+        [HttpPut("{employeeId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(typeof(EmployeeResponseDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateEmployee([FromRoute] Guid employeeId, [FromBody] EmployeeRequestDto employeeRequestDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var employee = await _employeeService.UpdateEmployee(employeeId,employeeRequestDto);
+
+            if (employee == null)
+            {
+                return UnprocessableEntity();
+            }
+
+            var mappedResult = _mapper.Map<EmployeeResponseDto>(employee);
+
+            return Ok(mappedResult);
+        }
+
+        [HttpDelete("{employeeId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteEmployee([FromRoute] Guid employeeId)
+        {
+            var employeeDeleted = await _employeeService.DeleteEmployee(employeeId);
+
+            if (!employeeDeleted)
+            {
+                return NotFound();
+            }
+
+            return Ok(employeeDeleted);
         }
 
     }

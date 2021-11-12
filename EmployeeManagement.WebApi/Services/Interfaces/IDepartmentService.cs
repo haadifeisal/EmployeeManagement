@@ -13,5 +13,6 @@ namespace EmployeeManagement.WebApi.Services.Interfaces
         Task<Department> CreateDepartment(DepartmentRequestDto departmentRequestDto);
         Task<Department> UpdateDepartment(Guid departmentId, DepartmentRequestDto departmentRequestDto);
         Task<bool> DeleteDepartment(Guid departmentId);
+        Task<Department> CheckIfDepartmentExist(Guid departmentId);
     }
 }
