@@ -1,6 +1,8 @@
 using AutoMapper;
 using EmployeeManagement.WebApi.DataTransferObjects.Configuration;
 using EmployeeManagement.WebApi.Repositories.EmployeeManagement;
+using EmployeeManagement.WebApi.Services;
+using EmployeeManagement.WebApi.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -26,12 +28,17 @@ namespace EmployeeManagement.WebApi
         {
 
             services.AddControllers();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigin", builder => builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+            });
 
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MapConfiguration());
             });
             var mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
 
             services.AddDbContext<EmployeeManagementContext>(options =>
             {
@@ -45,6 +52,9 @@ namespace EmployeeManagement.WebApi
                     });
             });
 
+            services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IDepartmentService, DepartmentService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "EmployeeManagement.WebApi", Version = "v1" });
@@ -57,15 +67,15 @@ namespace EmployeeManagement.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EmployeeManagement.WebApi v1"));
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors("AllowAllOrigin");
 
-            app.UseAuthorization();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EmployeeManagement.WebApi v1"));
 
             app.UseEndpoints(endpoints =>
             {

@@ -12,6 +12,10 @@ namespace EmployeeManagement.WebApi.DataTransferObjects.Configuration
         {
             CreateMap<Employee, EmployeeResponseDto>();
             CreateMap<EmployeeRequestDto, Employee>();
+
+            CreateMap<Department, DepartmentResponseDto>()
+                .ForMember(x => x.Employees, y => y.MapFrom(z => z.Employees));
+            CreateMap<DepartmentRequestDto, Department>();
         }
 
     }
