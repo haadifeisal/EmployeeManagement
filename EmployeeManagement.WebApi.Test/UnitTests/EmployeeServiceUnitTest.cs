@@ -7,6 +7,8 @@ using EmployeeManagement.WebApi.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EmployeeManagement.WebApi.DataTransferObjects.RequestDtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.WebApi.Test.UnitTests
 {
@@ -17,35 +19,33 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         public async Task GetEmployees_WhenTheresEmployeeData_ShouldReturnCollectionOf2EmployeeObjects()
         {
             //Arrange
-            var department = new Department
+            var newDepartment = new Department
             {
                 DepartmentId = Guid.NewGuid(),
                 Name = "IT"
             };
-            _employeeManagementcontext.Departments.Add(department);
+            _employeeManagementcontext.Departments.Add(newDepartment);
 
-            var employee1 = new Employee
+            var newEmployee1 = new Employee
             {
                 EmployeeId = Guid.NewGuid(),
                 Name = "Hanna",
                 Salary = 55000,
-                DepartmentId = department.DepartmentId
+                DepartmentId = newDepartment.DepartmentId
             };
-            _employeeManagementcontext.Employees.Add(employee1);
+            _employeeManagementcontext.Employees.Add(newEmployee1);
 
-            var employee2 = new Employee
+            var newEmployee2 = new Employee
             {
                 EmployeeId = Guid.NewGuid(),
                 Name = "Adam",
                 Salary = 47000,
-                DepartmentId = department.DepartmentId
+                DepartmentId = newDepartment.DepartmentId
             };
-            _employeeManagementcontext.Employees.Add(employee2);
+            _employeeManagementcontext.Employees.Add(newEmployee2);
             _employeeManagementcontext.SaveChanges();
 
             var departmentServiceMock = A.Fake<IDepartmentService>();
-
-            A.CallTo(() => departmentServiceMock.GetDetpartments()).Returns(new List<Department>());
 
             var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
 
@@ -60,10 +60,7 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         public async Task GetEmployees_WhenNoEmployeeDataIsFound_ShouldReturnEmptyCollection()
         {
             //Arrange
-
             var departmentServiceMock = A.Fake<IDepartmentService>();
-
-            A.CallTo(() => departmentServiceMock.GetDetpartments()).Returns(new List<Department>());
 
             var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
 
@@ -78,26 +75,24 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         public async Task GetEmployee_WhenEmployeeIsFound_ShouldReturnEmployeeObject()
         {
             //Arrange
-            var department = new Department
+            var newDepartment = new Department
             {
                 DepartmentId = Guid.NewGuid(),
                 Name = "IT"
             };
-            _employeeManagementcontext.Departments.Add(department);
+            _employeeManagementcontext.Departments.Add(newDepartment);
 
             var newEmployee = new Employee
             {
                 EmployeeId = Guid.NewGuid(),
                 Name = "Hanna",
                 Salary = 55000,
-                DepartmentId = department.DepartmentId
+                DepartmentId = newDepartment.DepartmentId
             };
             _employeeManagementcontext.Employees.Add(newEmployee);
             _employeeManagementcontext.SaveChanges();
 
             var departmentServiceMock = A.Fake<IDepartmentService>();
-
-            A.CallTo(() => departmentServiceMock.GetDetpartments()).Returns(new List<Department>());
 
             var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
 
@@ -114,26 +109,24 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         public async Task GetEmployee_WhenEmployeeIsNotFound_ShouldReturnNull()
         {
             //Arrange
-            var department = new Department
+            var newDepartment = new Department
             {
                 DepartmentId = Guid.NewGuid(),
                 Name = "IT"
             };
-            _employeeManagementcontext.Departments.Add(department);
+            _employeeManagementcontext.Departments.Add(newDepartment);
 
             var newEmployee = new Employee
             {
                 EmployeeId = Guid.NewGuid(),
                 Name = "Hanna",
                 Salary = 55000,
-                DepartmentId = department.DepartmentId
+                DepartmentId = newDepartment.DepartmentId
             };
             _employeeManagementcontext.Employees.Add(newEmployee);
             _employeeManagementcontext.SaveChanges();
 
             var departmentServiceMock = A.Fake<IDepartmentService>();
-
-            A.CallTo(() => departmentServiceMock.GetDetpartments()).Returns(new List<Department>());
 
             var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
 
@@ -142,6 +135,220 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
 
             //Assert
             Assert.IsNull(employee);
+        }
+
+        [TestMethod]
+        public async Task CreateEmployee_WhenEmployeeIsCreated_ShouldReturnTheCreatedEmployeeObject()
+        {
+            //Arrange
+            var newDepartment = new Department
+            {
+                DepartmentId = Guid.NewGuid(),
+                Name = "IT"
+            };
+            _employeeManagementcontext.Departments.Add(newDepartment);
+            _employeeManagementcontext.SaveChanges();
+
+            var employeeRequestDto = new EmployeeRequestDto
+            {
+                DepartmentId = newDepartment.DepartmentId,
+                Name = "Jacob",
+                Salary = 75000
+            };
+
+            var departmentServiceMock = A.Fake<IDepartmentService>();
+
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(newDepartment.DepartmentId)).Returns(new Department());
+
+            var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
+
+            //Act
+            var employee = await employeeService.CreateEmployee(employeeRequestDto);
+
+            //Assert
+            Assert.IsNotNull(employee);
+            Assert.AreEqual(employeeRequestDto.Name, employee.Name);
+            Assert.AreEqual(employeeRequestDto.DepartmentId, employee.DepartmentId);
+            Assert.IsNotNull(_employeeManagementcontext.Employees.AsNoTracking()
+                .FirstOrDefault(x => x.EmployeeId == employee.EmployeeId));
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(newDepartment.DepartmentId)).MustHaveHappenedOnceExactly();
+        }
+
+        [TestMethod]
+        public async Task CreateEmployee_WhenDepartmentIsNotFound_ShouldReturnNull()
+        {
+            //Arrange
+            var employeeRequestDto = new EmployeeRequestDto
+            {
+                DepartmentId = Guid.NewGuid(),
+                Name = "Jacob",
+                Salary = 75000
+            };
+
+            var departmentServiceMock = A.Fake<IDepartmentService>();
+
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(employeeRequestDto.DepartmentId)).Returns(Task.FromResult<Department>(null));
+
+            var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
+
+            //Act
+            var employee = await employeeService.CreateEmployee(employeeRequestDto);
+
+            //Assert
+            Assert.IsNull(employee);
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(employeeRequestDto.DepartmentId)).MustHaveHappenedOnceExactly();
+        }
+
+        [TestMethod]
+        public async Task UpdateEmployee_WhenEmployeeIsUpdated_ShouldReturnTheUpdatedEmployeeObject()
+        {
+            //Arrange
+            var newDepartment = new Department
+            {
+                DepartmentId = Guid.NewGuid(),
+                Name = "IT"
+            };
+            _employeeManagementcontext.Departments.Add(newDepartment);
+
+            var newEmployee = new Employee
+            {
+                EmployeeId = Guid.NewGuid(),
+                Name = "Hanna",
+                Salary = 55000,
+                DepartmentId = newDepartment.DepartmentId
+            };
+            _employeeManagementcontext.Employees.Add(newEmployee);
+            _employeeManagementcontext.SaveChanges();
+
+            var employeeRequestDto = new EmployeeRequestDto
+            {
+                DepartmentId = newDepartment.DepartmentId,
+                Name = "Mike",
+                Salary = 49000
+            };
+
+            var departmentServiceMock = A.Fake<IDepartmentService>();
+
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(newDepartment.DepartmentId)).Returns(new Department());
+
+            var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
+
+            //Act
+            var employee = await employeeService.UpdateEmployee(newEmployee.EmployeeId, employeeRequestDto);
+
+            //Assert
+            Assert.IsNotNull(employee);
+            Assert.AreEqual(employeeRequestDto.Name, employee.Name);
+            Assert.AreEqual(employeeRequestDto.Salary, employee.Salary);
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(newDepartment.DepartmentId)).MustHaveHappenedOnceExactly();
+        }
+
+        [TestMethod]
+        public async Task UpdateEmployee_WhenDepartmentIsNotFound_ShouldReturnNull()
+        {
+            //Arrange
+            var newDepartment = new Department
+            {
+                DepartmentId = Guid.NewGuid(),
+                Name = "IT"
+            };
+            _employeeManagementcontext.Departments.Add(newDepartment);
+
+            var newEmployee = new Employee
+            {
+                EmployeeId = Guid.NewGuid(),
+                Name = "Hanna",
+                Salary = 55000,
+                DepartmentId = newDepartment.DepartmentId
+            };
+            _employeeManagementcontext.Employees.Add(newEmployee);
+            _employeeManagementcontext.SaveChanges();
+
+            var employeeRequestDto = new EmployeeRequestDto
+            {
+                DepartmentId = newDepartment.DepartmentId,
+                Name = "Mike",
+                Salary = 49000
+            };
+
+            var departmentServiceMock = A.Fake<IDepartmentService>();
+
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(newDepartment.DepartmentId)).Returns(Task.FromResult<Department>(null));
+
+            var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
+
+            //Act
+            var employee = await employeeService.UpdateEmployee(newEmployee.EmployeeId, employeeRequestDto);
+
+            //Assert
+            Assert.IsNull(employee);
+            A.CallTo(() => departmentServiceMock.CheckIfDepartmentExist(newDepartment.DepartmentId)).MustHaveHappenedOnceExactly();
+        }
+
+        [TestMethod]
+        public async Task DeleteEmployee_WhenEmployeeIsDeleted_ShouldReturnTrue()
+        {
+            //Arrange
+            var newDepartment = new Department
+            {
+                DepartmentId = Guid.NewGuid(),
+                Name = "IT"
+            };
+            _employeeManagementcontext.Departments.Add(newDepartment);
+
+            var newEmployee = new Employee
+            {
+                EmployeeId = Guid.NewGuid(),
+                Name = "Hanna",
+                Salary = 55000,
+                DepartmentId = newDepartment.DepartmentId
+            };
+            _employeeManagementcontext.Employees.Add(newEmployee);
+            _employeeManagementcontext.SaveChanges();
+
+            var departmentServiceMock = A.Fake<IDepartmentService>();
+
+            var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
+
+            //Act
+            var employee = await employeeService.DeleteEmployee(newEmployee.EmployeeId);
+
+            //Assert
+            Assert.IsTrue(employee);
+            Assert.IsNull(_employeeManagementcontext.Employees.AsNoTracking()
+                .FirstOrDefault(x => x.EmployeeId == newEmployee.EmployeeId));
+        }
+
+        [TestMethod]
+        public async Task DeleteEmployee_WhenEmployeeIsNotFound_ShouldReturnFalse()
+        {
+            //Arrange
+            var newDepartment = new Department
+            {
+                DepartmentId = Guid.NewGuid(),
+                Name = "IT"
+            };
+            _employeeManagementcontext.Departments.Add(newDepartment);
+
+            var newEmployee = new Employee
+            {
+                EmployeeId = Guid.NewGuid(),
+                Name = "Hanna",
+                Salary = 55000,
+                DepartmentId = newDepartment.DepartmentId
+            };
+            _employeeManagementcontext.Employees.Add(newEmployee);
+            _employeeManagementcontext.SaveChanges();
+
+            var departmentServiceMock = A.Fake<IDepartmentService>();
+
+            var employeeService = new EmployeeService(_mapper, _employeeManagementcontext, departmentServiceMock);
+
+            //Act
+            var employee = await employeeService.DeleteEmployee(Guid.NewGuid());
+
+            //Assert
+            Assert.IsFalse(employee);
         }
 
     }
