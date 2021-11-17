@@ -40,9 +40,17 @@ namespace EmployeeManagement.WebApi
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
+            var dataSource = Configuration["DataSource"];
+            var catalog = Configuration["Catalog"];
+            var user = Configuration["User"];
+            var password = Configuration["Password"];
+            var connectionString = $"Data Source={dataSource};Initial Catalog={catalog};User ID={user};Password={password}";
+
             services.AddDbContext<EmployeeManagementContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("EmployeeManagement"),
+                if(string.IsNullOrEmpty(dataSource) || string.IsNullOrEmpty(catalog) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password))
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("DbConnection"),
                     sqlServerOptionsAction: sqlOptions =>
                     {
                         sqlOptions.EnableRetryOnFailure(
@@ -50,6 +58,19 @@ namespace EmployeeManagement.WebApi
                             maxRetryDelay: TimeSpan.FromSeconds(30),
                             errorNumbersToAdd: null);
                     });
+                }
+                else
+                {
+                    options.UseSqlServer(connectionString,
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 10,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                    });
+                }
+
             });
 
             services.AddScoped<IEmployeeService, EmployeeService>();
@@ -68,6 +89,8 @@ namespace EmployeeManagement.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            SeedDB.Populate(app);
 
             app.UseHttpsRedirection();
 
