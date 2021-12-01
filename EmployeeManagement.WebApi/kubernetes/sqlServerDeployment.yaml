@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqlserver-deployment
+spec:
+  selector:
+    matchLabels:
+      app: sqlserver-pod
+  template:
+    metadata:
+      labels:
+        app: sqlserver-pod
+    spec:
+      containers:
+      - name: sqlserver-container
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 1433
+        env:
+          - name: ACCEPT_EULA
+            valueFrom:
+              secretKeyRef:
+                name: sqlserver-secrets
+                key:  ACCEPT_EULA
+          - name: SA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sqlserver-secrets
+                key: SA_PASSWORD
+          - name: MSSQL_PID
+            valueFrom:
+              secretKeyRef: 
+                name: sqlserver-secrets
+                key: MSSQL_PID
+        volumeMounts:
+          - name: sql-db
+            mountPath: /var/opt/mssql/data
+      volumes:
+        - name: sql-db
+          persistentVolumeClaim:
+            claimName: sqlserver-pvc

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employeemanagementapi-deployment
+spec:
+  selector:
+    matchLabels:
+      app: employeemanagementapi-pod
+  template:
+    metadata:
+      labels:
+        app: employeemanagementapi-pod
+    spec:
+      containers:
+      - name: employeemanagementapi-container
+        image: haadi94/employeemanagementapi:v1
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+          - containerPort: 80
+        env:
+          - name: DataSource
+            value: sqlserver
+          - name: Catalog
+            valueFrom: 
+              secretKeyRef:
+                name: employeemanagement-secrets
+                key: catalog
+          - name: User
+            valueFrom:
+              secretKeyRef:
+                name: employeemanagement-secrets
+                key: user
+          - name: Password
+            valueFrom:
+              secretKeyRef:
+                name: employeemanagement-secrets
+                key: password
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 80
+
