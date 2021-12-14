@@ -14,36 +14,27 @@ spec:
       containers:
       - name: employeemanagementapi-container
         image: haadi94/employeemanagementapi:v1
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
         ports:
           - containerPort: 80
         env:
           - name: DataSource
-            value: sqlserver
+            value: "sqlserver-service"
           - name: Catalog
-            valueFrom: 
-              secretKeyRef:
-                name: employeemanagement-secrets
-                key: catalog
+            value: "EmployeeManagement"
           - name: User
-            valueFrom:
-              secretKeyRef:
-                name: employeemanagement-secrets
-                key: user
+            value: "sa"
           - name: Password
-            valueFrom:
-              secretKeyRef:
-                name: employeemanagement-secrets
-                key: password
-        livenessProbe:
-          httpGet:
-            path: /health/live
-            port: 80
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 80
+            value: "1Secure*Password1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: employeemanagementapi-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: employeemanagementapi-pod
+  ports:
+  - port: 80
+    targetPort: 80
 

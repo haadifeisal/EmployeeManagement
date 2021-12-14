@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: sqlserver-pvc
   labels:
-    app: sqlserver-pod
+    app: mssql
 spec:
   accessModes:
     - ReadWriteOnce

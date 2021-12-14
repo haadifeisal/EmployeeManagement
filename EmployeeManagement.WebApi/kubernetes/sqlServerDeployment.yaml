@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: sqlserver-container
-        image: mcr.microsoft.com/mssql/server:2019-latest
+        image: mcr.microsoft.com/mssql/server
         resources:
           limits:
             memory: "256Mi"
@@ -22,24 +22,15 @@ spec:
         - containerPort: 1433
         env:
           - name: ACCEPT_EULA
-            valueFrom:
-              secretKeyRef:
-                name: sqlserver-secrets
-                key:  ACCEPT_EULA
+            value: "Y"
           - name: SA_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: sqlserver-secrets
-                key: SA_PASSWORD
+            value: "1Secure*Password1"
           - name: MSSQL_PID
-            valueFrom:
-              secretKeyRef: 
-                name: sqlserver-secrets
-                key: MSSQL_PID
+            value: "Developer"
         volumeMounts:
-          - name: sql-db
+          - name: sqldb
             mountPath: /var/opt/mssql/data
       volumes:
-        - name: sql-db
+        - name: sqldb
           persistentVolumeClaim:
             claimName: sqlserver-pvc
