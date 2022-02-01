@@ -27,9 +27,8 @@ services:
   employeemanagementapi:
     build: .
     ports:
-      - "5004:80"
+      - "5003:80"
     environment:
-      - DbName=EmployeeManagement
       - DbUsername=user
       - DbPassword=user1234
     depends_on:
