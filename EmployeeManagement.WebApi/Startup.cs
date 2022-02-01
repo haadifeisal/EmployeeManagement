@@ -26,8 +26,8 @@ namespace EmployeeManagement.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigin", builder => builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
@@ -40,17 +40,17 @@ namespace EmployeeManagement.WebApi
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            services.AddDbContext<EmployeeManagementContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("EmployeeManagement"),
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 10,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null);
-                    });
-            });
+            var dbUsername = string.IsNullOrEmpty(Configuration["DbUsername"]) ? Configuration.GetValue<string>("DbUsername") : Configuration["DbUsername"];
+            var dbPassword = string.IsNullOrEmpty(Configuration["DbPassword"]) ? Configuration.GetValue<string>("DbPassword") : Configuration["DbPassword"];
+            var dbName = Configuration.GetValue<string>("DbName");
+            var dbHostname = Configuration.GetValue<string>("DbHostname");
+            var dbPort = Configuration.GetValue<string>("DbPort");
+
+            var con = $"Host={dbHostname};Port={dbPort};Database={dbName};Username={dbUsername};Password={dbPassword}";
+
+            Console.WriteLine($"\n\nConnectionString: {con}\n\n");
+
+            services.AddDbContext<EmployeeManagementContext>(options => options.UseNpgsql(con));
 
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
@@ -68,6 +68,8 @@ namespace EmployeeManagement.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            SeedDB.Populate(app);
 
             app.UseHttpsRedirection();
 
