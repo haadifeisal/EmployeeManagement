@@ -40,9 +40,9 @@ namespace EmployeeManagement.WebApi
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            var dbName = string.IsNullOrEmpty(Configuration["DbName"]) ? Configuration.GetConnectionString("DbName") : Configuration["DbName"];
-            var dbUsername = string.IsNullOrEmpty(Configuration["DbUsername"]) ? Configuration.GetConnectionString("DbUsername") : Configuration["DbUsername"];
-            var dbPassword = string.IsNullOrEmpty(Configuration["DbPassword"]) ? Configuration.GetConnectionString("DbPassword") : Configuration["DbPassword"];
+            var dbUsername = string.IsNullOrEmpty(Configuration["DbUsername"]) ? Configuration.GetValue<string>("DbUsername") : Configuration["DbUsername"];
+            var dbPassword = string.IsNullOrEmpty(Configuration["DbPassword"]) ? Configuration.GetValue<string>("DbPassword") : Configuration["DbPassword"];
+            var dbName = Configuration.GetValue<string>("DbName");
             var dbHostname = Configuration.GetValue<string>("DbHostname");
             var dbPort = Configuration.GetValue<string>("DbPort");
 
