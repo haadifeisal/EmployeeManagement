@@ -1,17 +1,9 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-
-#nullable disable
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.WebApi.Repositories.EmployeeManagement
 {
     public partial class EmployeeManagementContext : DbContext
     {
-        public EmployeeManagementContext()
-        {
-        }
-
         public EmployeeManagementContext(DbContextOptions<EmployeeManagementContext> options)
             : base(options)
         {
@@ -22,8 +14,6 @@ namespace EmployeeManagement.WebApi.Repositories.EmployeeManagement
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("Relational:Collation", "Finnish_Swedish_CI_AS");
-
             modelBuilder.Entity<Department>(entity =>
             {
                 entity.ToTable("Department");

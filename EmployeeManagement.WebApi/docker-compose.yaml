@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  postgresql:
+    container_name: postgreql_db
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user1234
+      - POSTGRES_DB=EmployeeManagement
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - postgresqldb:/var/lib/postgresql/data/
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin4@pgadmin.org
+      - PGADMIN_DEFAULT_PASSWORD=admin1234
+    ports:
+      - "5050:80"
+    restart: always
+    volumes:
+      - pgadmin:/root/.pgadmin
+
+  employeemanagementapi:
+    build: .
+    ports:
+      - "5004:80"
+    environment:
+      - DbName=EmployeeManagement
+      - DbUsername=user
+      - DbPassword=user1234
+    depends_on:
+      - postgresql
+
+volumes:
+  pgadmin:
+    driver: local
+  postgresqldb:
+    driver: local

@@ -4,18 +4,13 @@ using EmployeeManagement.WebApi.Repositories.EmployeeManagement;
 using EmployeeManagement.WebApi.Services;
 using EmployeeManagement.WebApi.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Linq;
-using System.Net.Mime;
-using System.Text.Json;
 
 namespace EmployeeManagement.WebApi
 {
@@ -45,41 +40,17 @@ namespace EmployeeManagement.WebApi
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            var dataSource = Configuration["DataSource"];
-            var catalog = Configuration["Catalog"];
-            var user = Configuration["User"];
-            var password = Configuration["Password"];
+            var dbName = string.IsNullOrEmpty(Configuration["DbName"]) ? Configuration.GetConnectionString("DbName") : Configuration["DbName"];
+            var dbUsername = string.IsNullOrEmpty(Configuration["DbUsername"]) ? Configuration.GetConnectionString("DbUsername") : Configuration["DbUsername"];
+            var dbPassword = string.IsNullOrEmpty(Configuration["DbPassword"]) ? Configuration.GetConnectionString("DbPassword") : Configuration["DbPassword"];
+            var dbHostname = Configuration.GetValue<string>("DbHostname");
+            var dbPort = Configuration.GetValue<string>("DbPort");
 
-            services.AddDbContext<EmployeeManagementContext>(options =>
-            {
-                if(string.IsNullOrEmpty(dataSource) || string.IsNullOrEmpty(catalog) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password))
-                {
-                    options.UseSqlServer(Configuration.GetConnectionString("DbConnection"),
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 10,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null);
-                    });
-                }
-                else
-                {
-                    options.UseSqlServer($"Data Source={dataSource};Initial Catalog={catalog};User ID={user};Password={password}",
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 10,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null);
-                    });
-                }
+            var con = $"Host={dbHostname};Port={dbPort};Database={dbName};Username={dbUsername};Password={dbPassword}";
 
-            });
+            Console.WriteLine($"\n\nConnectionString: {con}\n\n");
 
-            services.AddHealthChecks()
-                .AddSqlServer(string.IsNullOrEmpty(dataSource) ? Configuration.GetConnectionString("DbConnection") : $"Data Source={dataSource};Initial Catalog={catalog};User ID={user};Password={password}", 
-                              name: "sql", timeout: TimeSpan.FromSeconds(3), tags: new[] { "ready" });
+            services.AddDbContext<EmployeeManagementContext>(options => options.UseNpgsql(con));
 
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
@@ -111,34 +82,6 @@ namespace EmployeeManagement.WebApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions()
-                {
-                    Predicate = (check) => check.Tags.Contains("ready"),
-                    ResponseWriter = async(context, report) =>
-                    {
-                        var result = JsonSerializer.Serialize(
-                            new
-                            {
-                                status = report.Status.ToString(),
-                                checks = report.Entries.Select(entry => new
-                                {
-                                    name = entry.Key,
-                                    status = entry.Value.Status.ToString(),
-                                    exception = entry.Value.Exception != null ? entry.Value.Exception.Message : "none",
-                                    duration = entry.Value.Duration.ToString()
-                                })
-                            }
-                        );
-
-                        context.Response.ContentType = MediaTypeNames.Application.Json;
-                        await context.Response.WriteAsync(result);
-                    }
-                });
-
-                endpoints.MapHealthChecks("/health/live", new HealthCheckOptions()
-                {
-                    Predicate = (_) => false
-                });
             });
         }
     }
