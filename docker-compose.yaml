@@ -31,6 +31,9 @@ services:
     environment:
       - DbUsername=user
       - DbPassword=user1234
+      - DbName=EmployeeManagement
+      - DbHostname=postgresql
+      - DbPort=5432
     depends_on:
       - postgresql
 
