@@ -6,7 +6,7 @@ services:
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=user1234
-      - POSTGRES_DB=EmployeeManagement
+      - POSTGRES_DB=emDb
     ports:
       - "5432:5432"
     restart: always
@@ -31,7 +31,7 @@ services:
     environment:
       - DbUsername=user
       - DbPassword=user1234
-      - DbName=EmployeeManagement
+      - DbName=emDb
       - DbHostname=postgresql
       - DbPort=5432
     depends_on:
