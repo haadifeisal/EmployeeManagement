@@ -26,7 +26,7 @@ jobs:
        
       - name: Build
         run: dotnet build --configuration Release --no-restore
-        working-directory: EmployeeManagement.WebApi.Test/
+        working-directory: EmployeeManagement.WebApi.Testt/
        
       - name: Run Tests
         run: dotnet test --no-restore --verbosity normal
