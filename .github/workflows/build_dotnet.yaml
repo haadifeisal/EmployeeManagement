@@ -1,4 +1,4 @@
-name: Test API CI
+name: Build API CI
 
 on:
   pull_request:
