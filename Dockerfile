@@ -3,10 +3,10 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
-COPY ["EmployeeManagement.WebApi.csproj", "./"]
-RUN dotnet restore "EmployeeManagement.WebApi.csproj"
+COPY ["EmployeeManagement.WebApi/EmployeeManagement.WebApi.csproj", "EmployeeManagement.WebApi/"]
+RUN dotnet restore "EmployeeManagement.WebApi/EmployeeManagement.WebApi.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/EmployeeManagement.WebApi"
 RUN dotnet build "EmployeeManagement.WebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish

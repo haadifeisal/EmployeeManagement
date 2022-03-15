@@ -42,9 +42,9 @@ namespace EmployeeManagement.WebApi
 
             var dbUsername = string.IsNullOrEmpty(Configuration["DbUsername"]) ? Configuration.GetValue<string>("DbUsername") : Configuration["DbUsername"];
             var dbPassword = string.IsNullOrEmpty(Configuration["DbPassword"]) ? Configuration.GetValue<string>("DbPassword") : Configuration["DbPassword"];
-            var dbName = Configuration.GetValue<string>("DbName");
-            var dbHostname = Configuration.GetValue<string>("DbHostname");
-            var dbPort = Configuration.GetValue<string>("DbPort");
+            var dbName = string.IsNullOrEmpty(Configuration["DbName"]) ? Configuration.GetValue<string>("DbName") : Configuration["DbName"];
+            var dbHostname = string.IsNullOrEmpty(Configuration["DbHostname"]) ? Configuration.GetValue<string>("DbHostname") : Configuration["DbHostname"];
+            var dbPort = string.IsNullOrEmpty(Configuration["DbPort"]) ? Configuration.GetValue<string>("DbPort") : Configuration["DbPort"];
 
             var con = $"Host={dbHostname};Port={dbPort};Database={dbName};Username={dbUsername};Password={dbPassword}";
 
