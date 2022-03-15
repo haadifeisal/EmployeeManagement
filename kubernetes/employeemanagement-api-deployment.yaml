@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employeemanagement-api-deployment
+  labels:
+    app: em-api
+    app.kubernetes.io/part-of: employeemanagement
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: em-api
+  template:
+    metadata:
+      labels:
+        app: em-api
+    spec:
+      containers:
+      - name: em-api-container
+        image: haadi94/employeemanagement-api:v1.4
+        ports:
+          - containerPort: 80
+        env:
+          - name: DbUsername
+            valueFrom:
+              secretKeyRef:
+                name: employeemanagement-api-db-credentials-ss
+                key: username
+          - name: DbPassword
+            valueFrom:
+              secretKeyRef:
+                name: employeemanagement-api-db-credentials-ss
+                key: password
+          - name: DbName
+            valueFrom:
+              secretKeyRef:
+                name: employeemanagement-api-db-credentials-ss
+                key: db
+          - name: DbHostname
+            valueFrom:
+              configMapKeyRef:
+                name: "em-api-conf"
+                key: DB_HOSTNAME
+          - name: DbPort
+            valueFrom:
+              configMapKeyRef:
+                name: "em-api-conf"
+                key: DB_PORT
