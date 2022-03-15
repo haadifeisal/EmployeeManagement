@@ -1,0 +1,36 @@
+name: Test API CI
+
+on:
+  pull_request:
+    branches: [main]
+  
+jobs:
+  api-test:
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+       
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.102
+       
+      - name: Install Dependencies 
+        run: dotnet restore
+        working-directory: EmployeeManagement.WebApi/
+       
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: EmployeeManagement.WebApi/
+       
+      - name: Docker Login
+        uses: actions/checkout@v1
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Docker Build
+        run: docker build -t ${{ secrets.DOCKER_USER }}/employeemanagement-api:${{ github.sha}} .
+      - name: Docker Push Image
+        run: docker push ${{ secrets.DOCKER_USER }}/employeemanagement-api:${{ github.sha}}
