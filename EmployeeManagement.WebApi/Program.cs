@@ -20,7 +20,6 @@ namespace EmployeeManagement.WebApi
                     var db = scope.ServiceProvider.GetRequiredService<EmployeeManagementContext>();
 
                     db.Database.Migrate();
-                    db.Database.EnsureCreated();
                 }
 
                 host.Run();

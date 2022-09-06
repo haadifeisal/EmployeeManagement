@@ -2,6 +2,7 @@
 using EmployeeManagement.WebApi.DataTransferObjects.RequestDtos;
 using EmployeeManagement.WebApi.DataTransferObjects.ResponseDtos;
 using EmployeeManagement.WebApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,6 +14,7 @@ namespace EmployeeManagement.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IMapper _mapper;
