@@ -1,27 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace EmployeeManagement.WebApi.Repositories.EmployeeManagement
 {
-    public static class SeedDB
+    public class SeedDB
     {
-        public static void Populate(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.CreateScope())
-            {
-                SeedData(serviceScope.ServiceProvider.GetService<EmployeeManagementContext>());
-            }
-        }
-
         public static void SeedData(EmployeeManagementContext context)
         {
-            context.Database.Migrate();
-
             if (!context.Departments.Any())
             {
                 System.Console.WriteLine("\n\nAdding data - Seeding ...\n\n");
