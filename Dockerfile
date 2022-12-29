@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["EmployeeManagement.WebApi/EmployeeManagement.WebApi.csproj", "EmployeeManagement.WebApi/"]
 RUN dotnet restore "EmployeeManagement.WebApi/EmployeeManagement.WebApi.csproj"

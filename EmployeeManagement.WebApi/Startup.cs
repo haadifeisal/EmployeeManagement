@@ -69,7 +69,7 @@ namespace EmployeeManagement.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            //SeedDB.Populate(app);
+            SeedDB.Populate(app);
 
             app.UseHttpsRedirection();
 

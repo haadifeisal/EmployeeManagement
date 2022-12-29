@@ -32,6 +32,8 @@ services:
       - DbUsername=user
       - DbPassword=user1234
       - DbName=emDb
+      - DbHostname=postgresql
+      - DbPort=5432
     depends_on:
       - postgresql
 
