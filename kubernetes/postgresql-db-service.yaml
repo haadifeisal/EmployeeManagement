@@ -5,9 +5,9 @@ metadata:
   labels:
     app.kubernetes.io/part-of: employeemanagement
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: postgresql-db
   ports:
-  - port: 5432
+  - port: 5433
     targetPort: 5432

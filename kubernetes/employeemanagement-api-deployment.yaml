@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: em-api-container
-        image: haadi94/employeemanagement-api:v1.4
+        image: haadi94/employeemanagement-api:91f9b8c09ebd8b884ce99ac8e662de74ac614544
         ports:
           - containerPort: 80
         env:

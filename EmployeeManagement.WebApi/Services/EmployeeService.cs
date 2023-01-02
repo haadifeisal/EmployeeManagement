@@ -33,7 +33,7 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<Employee> GetEmployee(Guid employeeId)
         {
-            var employee = await _employeeManagementContext.Employees.AsNoTracking()
+            var employee = await _employeeManagementContext.Employees
                 .FirstOrDefaultAsync(x => x.EmployeeId == employeeId);
 
             return employee;
@@ -59,7 +59,7 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<Employee> UpdateEmployee(Guid employeeId, EmployeeRequestDto employeeRequestDto)
         {
-            var employee = await CheckIfEmployeeExist(employeeId);
+            var employee = await GetEmployee(employeeId);
 
             if (employee == null)
             {
@@ -84,7 +84,7 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<bool> DeleteEmployee(Guid employeeId)
         {
-            var employee = await CheckIfEmployeeExist(employeeId);
+            var employee = await GetEmployee(employeeId);
 
             if (employee == null)
             {
@@ -98,14 +98,6 @@ namespace EmployeeManagement.WebApi.Services
             }
 
             return false;
-        }
-
-        private async Task<Employee> CheckIfEmployeeExist(Guid employeeId)
-        {
-            var employee = await _employeeManagementContext.Employees
-                .FirstOrDefaultAsync(x => x.EmployeeId == employeeId);
-
-            return employee;
         }
     }
 }
