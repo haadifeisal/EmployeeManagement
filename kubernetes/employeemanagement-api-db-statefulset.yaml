@@ -1,50 +1,50 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgresql-db-statefulset
+  name: employeemanagement-api-db-statefulset
   labels:
-    app: postgresql-db
+    app: employeemanagement-api-db
     app.kubernetes.io/part-of: employeemanagement
 spec:
-  serviceName: postgresql-db-svc
+  serviceName: employeemanagement-api-db-svc
   selector:
      matchLabels:
-       app: postgresql-db
+       app: employeemanagement-api-db
   replicas: 1
   template:
     metadata:
       labels:
-        app: postgresql-db
+        app: employeemanagement-api-db
     spec:
       containers:
-      - name: postgresql-db
-        image: postgres:13
+      - name: employeemanagement-api-db
+        image: postgres:15
         ports:
         - containerPort: 5432
         env:
           - name: POSTGRES_DB
             valueFrom:
               secretKeyRef:
-                name: postgresql-db-credentials-ss
+                name: employeemanagement-api-db-credentials-ss
                 key: db
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: postgresql-db-credentials-ss
+                name: employeemanagement-api-db-credentials-ss
                 key: username
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: postgresql-db-credentials-ss
+                name: employeemanagement-api-db-credentials-ss
                 key: password
         volumeMounts:
-          - name: postgresql-db-disk
+          - name: employeemanagement-api-db-disk
             mountPath: /var/lib/postgresql/data
   volumeClaimTemplates:
     - metadata:
-        name: postgresql-db-disk
+        name: employeemanagement-api-db-disk
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: 500M
+            storage: 200M
