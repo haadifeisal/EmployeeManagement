@@ -21,21 +21,6 @@ spec:
         ports:
           - containerPort: 80
         env:
-          - name: DbUsername
-            valueFrom:
-              secretKeyRef:
-                name: employeemanagement-api-db-credentials-ss
-                key: username
-          - name: DbPassword
-            valueFrom:
-              secretKeyRef:
-                name: employeemanagement-api-db-credentials-ss
-                key: password
-          - name: DbName
-            valueFrom:
-              secretKeyRef:
-                name: employeemanagement-api-db-credentials-ss
-                key: db
           - name: DbHostname
             valueFrom:
               configMapKeyRef:
@@ -46,3 +31,9 @@ spec:
               configMapKeyRef:
                 name: "em-api-conf"
                 key: DB_PORT
+        volumeMounts:
+            - name: employeemanagement-api-appsettings-volume
+              mountPath: /app/appsettings.json
+              subPath: employeemanagement-api-appsettings.json
+            - name: employeemanagement-api-appsettings-secrets-volume
+              mountPath: /app/Secrets
