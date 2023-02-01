@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace EmployeeManagement.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
     {
         private readonly IMapper _mapper;
