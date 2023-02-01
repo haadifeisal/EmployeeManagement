@@ -1,0 +1,15 @@
+{
+    "Logging": {
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information"
+      }
+    },
+    "AllowedOrigins": [
+      "http://localhost:3000"
+    ],
+    "DbHostname": "postgresql-db-svc.default.svc.cluster.local",
+    "DbPort": "5433"
+  }
+  

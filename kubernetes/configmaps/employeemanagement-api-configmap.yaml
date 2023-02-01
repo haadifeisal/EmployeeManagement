@@ -5,5 +5,5 @@ metadata:
   labels:
     app: em-api
 data:
-  DB_HOSTNAME: "10.107.160.194"
+  DB_HOSTNAME: postgresql-db-svc.default.svc.cluster.local
   DB_PORT: "5433"
