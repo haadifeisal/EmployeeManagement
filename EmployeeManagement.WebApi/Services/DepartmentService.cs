@@ -21,7 +21,7 @@ namespace EmployeeManagement.WebApi.Services
             _employeeManagementContext = employeeManagementContext;
         }
 
-        public async Task<IEnumerable<Department>> GetDetpartments()
+        public async Task<IEnumerable<Department>> GetDepartments()
         {
             var departments = await _employeeManagementContext.Departments.AsNoTracking().Include(x => x.Employees)
                 .ToListAsync();
