@@ -29,7 +29,7 @@ namespace EmployeeManagement.WebApi.Controllers
         [ProducesResponseType(typeof(IEnumerable<DepartmentResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDepartments()
         {
-            var departments = await _departmentService.GetDetpartments();
+            var departments = await _departmentService.GetDepartments();
 
             if (!departments.Any())
             {

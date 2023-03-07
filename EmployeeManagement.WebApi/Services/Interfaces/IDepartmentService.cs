@@ -8,7 +8,7 @@ namespace EmployeeManagement.WebApi.Services.Interfaces
 {
     public interface IDepartmentService
     {
-        Task<IEnumerable<Department>> GetDetpartments();
+        Task<IEnumerable<Department>> GetDepartments();
         Task<Department> GetDepartment(Guid departmentId);
         Task<Department> CreateDepartment(DepartmentRequestDto departmentRequestDto);
         Task<Department> UpdateDepartment(Guid departmentId, DepartmentRequestDto departmentRequestDto);
