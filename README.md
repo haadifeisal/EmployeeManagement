@@ -7,7 +7,6 @@ Some of the tools/technologies used in this project are listed below:
 * Docker
 * Kubernetes
 * PostgreSQL
-* Keycloak
 * GitHub actions/workflows
 
 
