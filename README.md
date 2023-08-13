@@ -10,6 +10,12 @@ Some of the tools/technologies used in this project are listed below:
 * GitHub actions/workflows
 
 
+ToDo: 
+* Add Fluent Validation
+* Configure Logging with SeriLog
+* Exception & Error Handler
+
+
 To run the application in docker:
 
 1. Place yourself in the /EmployeeManagement directory, then run the following command docker-compose up --build
