@@ -11,9 +11,8 @@ Some of the tools/technologies used in this project are listed below:
 
 
 ToDo: 
-* Add Fluent Validation
-* Configure Logging with SeriLog
 * Exception & Error Handler
+* Configure Logging with SeriLog
 
 
 To run the application in docker:
