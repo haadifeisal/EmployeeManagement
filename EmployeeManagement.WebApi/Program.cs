@@ -11,6 +11,8 @@ using EmployeeManagement.WebApi.Extensions;
 using AutoMapper;
 using EmployeeManagement.WebApi.DataTransferObjects.Configuration;
 using Microsoft.OpenApi.Models;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args).ConfigureSecrets();
 
@@ -54,6 +56,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton(mapper);
 
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
