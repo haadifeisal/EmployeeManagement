@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EmployeeManagement.WebApi.DataTransferObjects.RequestDtos;
 using EmployeeManagement.WebApi.DataTransferObjects.ResponseDtos;
+using EmployeeManagement.WebApi.Exceptions;
 using EmployeeManagement.WebApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +51,7 @@ namespace EmployeeManagement.WebApi.Controllers
 
             if (employee == null)
             {
-                return NotFound();
+                throw new NotFoundException($"Employee with Id: {employeeId} was not found");
             }
 
             var mappedResult = _mapper.Map<EmployeeResponseDto>(employee);
@@ -114,7 +115,7 @@ namespace EmployeeManagement.WebApi.Controllers
 
             if (!employeeDeleted)
             {
-                return NotFound();
+                return UnprocessableEntity();
             }
 
             return Ok(employeeDeleted);

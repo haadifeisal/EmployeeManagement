@@ -59,14 +59,14 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<Department> UpdateDepartment(Guid departmentId, DepartmentRequestDto departmentRequestDto)
         {
-            var department = await CheckIfDepartmentExist(departmentId);
+            var department = await GetDepartment(departmentId);
 
             if (department == null)
             {
-                return null;
+                throw new Exceptions.KeyNotFoundException($"Department with Id {departmentId} was not found");
             }
 
-            department.Name = string.IsNullOrEmpty(departmentRequestDto.Name) ? department.Name : departmentRequestDto.Name;
+            department.Name = departmentRequestDto.Name;
 
             await _employeeManagementContext.SaveChangesAsync();
 
@@ -75,17 +75,14 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<bool> DeleteDepartment(Guid departmentId)
         {
-            var department = await CheckIfDepartmentExist(departmentId);
+            var department = await GetDepartment(departmentId);
 
             if(department == null)
             {
-                return false;
+                throw new Exceptions.KeyNotFoundException($"Department with Id {departmentId} was not found");
             }
 
-            var departmentHasEmployees = await _employeeManagementContext.Departments.AsNoTracking()
-                .AnyAsync(x => x.DepartmentId == departmentId && x.Employees.Any());
-
-            if (departmentHasEmployees)
+            if (department.Employees.Any())
             {
                 return false;
             }

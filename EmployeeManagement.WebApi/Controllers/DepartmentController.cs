@@ -113,7 +113,7 @@ namespace EmployeeManagement.WebApi.Controllers
 
             if (!departmentDeleted)
             {
-                return NotFound();
+                return UnprocessableEntity();
             }
 
             return Ok(departmentDeleted);

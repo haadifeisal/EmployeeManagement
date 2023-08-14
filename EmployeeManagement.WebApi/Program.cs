@@ -13,6 +13,7 @@ using EmployeeManagement.WebApi.DataTransferObjects.Configuration;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using FluentValidation;
+using EmployeeManagement.WebApi.Configurations;
 
 var builder = WebApplication.CreateBuilder(args).ConfigureSecrets();
 
@@ -93,5 +94,7 @@ app.UseCors(allowedOrigins);
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.AddGlobalErrorHandler();
 
 app.Run();

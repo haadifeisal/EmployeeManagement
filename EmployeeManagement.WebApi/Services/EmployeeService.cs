@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EmployeeManagement.WebApi.DataTransferObjects.RequestDtos;
+using EmployeeManagement.WebApi.Exceptions;
 using EmployeeManagement.WebApi.Repositories.EmployeeManagement;
 using EmployeeManagement.WebApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -41,11 +42,11 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<Employee> CreateEmployee(EmployeeRequestDto employeeRequestDto)
         {
-            var department = await _departmentService.CheckIfDepartmentExist(employeeRequestDto.DepartmentId);
+            var department = await _departmentService.GetDepartment(employeeRequestDto.DepartmentId);
 
             if(department == null)
             {
-                return null;
+                throw new Exceptions.KeyNotFoundException($"Department with Id {employeeRequestDto.DepartmentId} was not found");
             }
 
             var newEmployee = _mapper.Map<Employee>(employeeRequestDto);
@@ -63,14 +64,14 @@ namespace EmployeeManagement.WebApi.Services
 
             if (employee == null)
             {
-                return null;
+                throw new Exceptions.KeyNotFoundException($"Employee with Id {employeeId} was not found");
             }
 
-            var department = await _departmentService.CheckIfDepartmentExist(employeeRequestDto.DepartmentId);
+            var department = await _departmentService.GetDepartment(employeeRequestDto.DepartmentId);
 
             if (department == null)
             {
-                return null;
+                throw new Exceptions.KeyNotFoundException($"Department with Id {employeeRequestDto.DepartmentId} was not found");
             }
 
             employee.Name = string.IsNullOrEmpty(employeeRequestDto.Name) ? employee.Name : employeeRequestDto.Name;
@@ -88,7 +89,7 @@ namespace EmployeeManagement.WebApi.Services
 
             if (employee == null)
             {
-                return false;
+                throw new Exceptions.KeyNotFoundException($"Employee with Id {employeeId} was not found");
             }
 
             _employeeManagementContext.Employees.Remove(employee);
