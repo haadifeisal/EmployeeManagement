@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EmployeeManagement.WebApi.DataTransferObjects.RequestDtos;
 using Microsoft.EntityFrameworkCore;
+using EmployeeManagement.WebApi.Exceptions;
 
 namespace EmployeeManagement.WebApi.Test.UnitTests
 {
@@ -53,7 +54,7 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         }
 
         [TestMethod]
-        public async Task GetDepartments_WhenNoDepartmentIsFound_ShouldReturnEmptyCollection()
+        public async Task GetDepartments_WhenNoDepartmentsExistShouldReturnEmptyCollection()
         {
             //Arrange
             var departmentService = new DepartmentService(_mapper, _employeeManagementcontext);
@@ -128,6 +129,29 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         }
 
         [TestMethod]
+        public async Task CreateDepartment_WhenDepartmentNameExists_ShouldThrowObjectAlreadyExistsException()
+        {
+            //Arrange
+            var newDepartment = new Department
+            {
+                DepartmentId = Guid.NewGuid(),
+                Name = "IT"
+            };
+            _employeeManagementcontext.Departments.Add(newDepartment);
+            _employeeManagementcontext.SaveChanges();
+
+            var departmentRequestDto = new DepartmentRequestDto
+            {
+                Name = "IT"
+            };
+
+            var departmentService = new DepartmentService(_mapper, _employeeManagementcontext);
+
+            //Assert
+            await Assert.ThrowsExceptionAsync<ObjectAlreadyExistsException>(() => departmentService.CreateDepartment(departmentRequestDto));
+        }
+
+        [TestMethod]
         public async Task UpdateDepartment_WhenDepartmentIsUpdated_ShouldReturnTheUpdatedDepartmentObject()
         {
             //Arrange
@@ -155,7 +179,7 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         }
 
         [TestMethod]
-        public async Task UpdateDepartment_WhenDepartmentIsNotFound_ShouldReturnNull()
+        public async Task UpdateDepartment_WhenDepartmentIsNotFound_ShouldThrowKeyNotFoundException()
         {
             //Arrange
             var newDepartment = new Department
@@ -173,11 +197,8 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
 
             var departmentService = new DepartmentService(_mapper, _employeeManagementcontext);
 
-            //Act
-            var department = await departmentService.UpdateDepartment(Guid.NewGuid(), departmentRequestDto);
-
             //Assert
-            Assert.IsNull(department);
+            await Assert.ThrowsExceptionAsync<Exceptions.KeyNotFoundException>(() => departmentService.UpdateDepartment(Guid.NewGuid(), departmentRequestDto));
         }
 
         [TestMethod]
@@ -204,7 +225,7 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
         }
 
         [TestMethod]
-        public async Task DeleteDepartment_WhenDepartmentIsNotFound_ShouldReturnFalse()
+        public async Task DeleteDepartment_WhenDepartmentIsNotFound_ShouldThrowKeyNotFoundException()
         {
             //Arrange
             var newDepartment = new Department
@@ -213,14 +234,12 @@ namespace EmployeeManagement.WebApi.Test.UnitTests
                 Name = "IT"
             };
             _employeeManagementcontext.Departments.Add(newDepartment);
+            _employeeManagementcontext.SaveChanges();
 
             var departmentService = new DepartmentService(_mapper, _employeeManagementcontext);
 
-            //Act
-            var department = await departmentService.DeleteDepartment(Guid.NewGuid());
-
             //Assert
-            Assert.IsFalse(department);
+            await Assert.ThrowsExceptionAsync<Exceptions.KeyNotFoundException>(() => departmentService.DeleteDepartment(Guid.NewGuid()));
         }
 
 

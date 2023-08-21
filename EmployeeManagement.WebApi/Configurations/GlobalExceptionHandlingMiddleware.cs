@@ -42,6 +42,10 @@ namespace EmployeeManagement.WebApi.Configurations
             {
                 status = HttpStatusCode.BadRequest;
             }
+            else if (exceptionType == typeof(ObjectAlreadyExistsException))
+            {
+                status = HttpStatusCode.BadRequest;
+            }
             else
             {
                 status = HttpStatusCode.InternalServerError;

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EmployeeManagement.WebApi.DataTransferObjects.RequestDtos;
+using EmployeeManagement.WebApi.Exceptions;
 using EmployeeManagement.WebApi.Repositories.EmployeeManagement;
 using EmployeeManagement.WebApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -44,7 +45,7 @@ namespace EmployeeManagement.WebApi.Services
 
             if (department != null)
             {
-                return null;
+                throw new ObjectAlreadyExistsException($"Department with name {departmentRequestDto.Name} already exists.");
             }
 
             var newDepartment = _mapper.Map<Department>(departmentRequestDto);
@@ -59,7 +60,7 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<Department> UpdateDepartment(Guid departmentId, DepartmentRequestDto departmentRequestDto)
         {
-            var department = await GetDepartment(departmentId);
+            var department = await CheckIfDepartmentExist(departmentId);
 
             if (department == null)
             {
@@ -75,7 +76,7 @@ namespace EmployeeManagement.WebApi.Services
 
         public async Task<bool> DeleteDepartment(Guid departmentId)
         {
-            var department = await GetDepartment(departmentId);
+            var department = await CheckIfDepartmentExist(departmentId);
 
             if(department == null)
             {
